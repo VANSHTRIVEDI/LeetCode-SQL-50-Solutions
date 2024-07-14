@@ -33,3 +33,25 @@ Return the result table in any order.
 */
 
 
+
+
+-- 1 way 
+select a1.machine_id, round(avg(a2.timestamp-a1.timestamp), 3) as processing_time 
+from Activity a1
+join Activity a2 
+on a1.machine_id=a2.machine_id and a1.process_id=a2.process_id and a1.activity_type='start' and a2.activity_type='end'
+group by a1.machine_id
+
+
+-- 2 way 
+WITH CTE AS(
+SELECT 
+machine_id,
+process_id, 
+ROUND(MAX(timestamp) - MIN(timestamp),3) AS time_difference 
+FROM Activity GROUP BY machine_id,process_id 
+)
+
+SELECT machine_id,ROUND(AVG(time_difference),3)as processing_time from CTE GROUP BY machine_id;
+
+
